@@ -1,4 +1,4 @@
-package main
+package models
 
 type Player struct {
 	PlayerID     string `json:"player_id" gorm:"primary_key"`
@@ -27,7 +27,7 @@ type Player struct {
 	BbrefID      string `json:"bbref_id"`
 }
 
-func parser(record []string) *Player {
+func ParsePlayer(record []string) *Player {
 	return &Player{
 		PlayerID:     record[0],
 		BirthYear:    record[1],

@@ -1,4 +1,4 @@
-package main
+package files
 
 import (
 	"encoding/csv"
@@ -6,15 +6,17 @@ import (
 	"io"
 	"os"
 	"time"
+
+	"parser/models"
 )
 
-func ReadObjectsCSV(filepath string) []*Player {
+func ReadObjectsCSV(filepath string) []*models.Player {
 	start := time.Now()
 	file, _ := os.Open(filepath)
 	defer file.Close()
 
 	csvReader := csv.NewReader(file)
-	objects := make([]*Player, 0)
+	objects := make([]*models.Player, 0)
 	for {
 		record, err := csvReader.Read()
 		if err == io.EOF {
@@ -24,7 +26,7 @@ func ReadObjectsCSV(filepath string) []*Player {
 			fmt.Println("csv reader error: ", err.Error())
 			break
 		}
-		objects = append(objects, parser(record))
+		objects = append(objects, models.ParsePlayer(record))
 	}
 	fmt.Println("objects has length:", len(objects))
 	fmt.Println("read data time:", time.Since(start))
@@ -47,30 +49,30 @@ func GetVersions(path string) (old string, new string) {
 	return
 }
 
-func ParseDiffs(path string) ([]Player, []Player, []Player) {
+func ParseDiffs(path string) ([]models.Player, []models.Player, []models.Player) {
 	oldFile, newFile := GetVersions(path)
 	fmt.Printf("Processing files: old=%v, new=%v", oldFile, newFile)
 	diffs := CalcFileDiff(oldFile, newFile)
 
-	var changed []Player
-	var added []Player
-	var removed []Player
+	var changed []models.Player
+	var added []models.Player
+	var removed []models.Player
 	for key, val := range diffs {
 		if key == "Added" {
 			for _, row := range val {
-				obj := parser(row)
+				obj := models.ParsePlayer(row)
 				added = append(added, *obj)
 			}
 		}
 		if key == "Removed" {
 			for _, row := range val {
-				obj := parser(row)
+				obj := models.ParsePlayer(row)
 				removed = append(removed, *obj)
 			}
 		}
 		if key == "Changed" {
 			for _, row := range val {
-				obj := parser(row)
+				obj := models.ParsePlayer(row)
 				changed = append(changed, *obj)
 			}
 		}

@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"parser/models"
 )
 
 func ConnectDB(filename string) *gorm.DB {
@@ -14,7 +15,7 @@ func ConnectDB(filename string) *gorm.DB {
 		fmt.Println("error on open DB", err.Error())
 		return nil
 	}
-	err = db.AutoMigrate(&Player{})
+	err = db.AutoMigrate(&models.Player{})
 	if err != nil {
 		fmt.Println("error on migrating DB", err.Error())
 		return nil
@@ -22,25 +23,25 @@ func ConnectDB(filename string) *gorm.DB {
 	return db
 }
 
-func BatchInsert(db *gorm.DB, data []*Player) {
+func BatchInsert(db *gorm.DB, data []*models.Player) {
 	start := time.Now()
 	db.CreateInBatches(&data, 1000)
 	fmt.Println("db batch insertion takes time:", time.Since(start))
 }
 
-func Create(db *gorm.DB, data []Player) {
-	fmt.Printf("db batchinsert: %v\n", data)
+func Create(db *gorm.DB, data []models.Player) {
+	fmt.Printf("+++ db batchinsert: %v\n", data)
 	db.CreateInBatches(&data, 10)
 }
 
-func Update(db *gorm.DB, data []Player) {
+func Update(db *gorm.DB, data []models.Player) {
 	for _, object := range data {
-		fmt.Printf("db update: %v\n", object)
+		fmt.Printf("*** db update: %v\n", object)
 		db.Save(&object)
 	}
 }
 
-func Delete(db *gorm.DB, data []Player) {
-	fmt.Printf("db delete: %v\n", data)
+func Delete(db *gorm.DB, data []models.Player) {
+	fmt.Printf("--- db delete: %v\n", data)
 	db.Delete(&data)
 }

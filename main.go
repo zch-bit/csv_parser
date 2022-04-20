@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"gorm.io/gorm"
+	"parser/database"
+	"parser/files"
 )
 
 /*
@@ -19,21 +21,21 @@ func main() {
 	var db *gorm.DB
 	if os.Getenv("PARSER_NEW_DB") == "true" {
 		fmt.Println("Set a new database")
-		db = ConnectDB(DBFilename)
-		data := ReadObjectsCSV(csvFilepath)
-		BatchInsert(db, data)
+		db = database.ConnectDB(DBFilename)
+		data := files.ReadObjectsCSV(csvFilepath)
+		database.BatchInsert(db, data)
 		fmt.Println("Dumped csv data into database:", DBFilename)
 	} else {
-		db = ConnectDB(DBFilename)
-		changed, added, deleted := ParseDiffs(csvPath)
+		db = database.ConnectDB(DBFilename)
+		changed, added, deleted := files.ParseDiffs(csvPath)
 		if len(changed) > 0 {
-			Update(db, changed)
+			database.Update(db, changed)
 		}
 		if len(added) > 0 {
-			Create(db, added)
+			database.Create(db, added)
 		}
 		if len(deleted) > 0 {
-			Delete(db, deleted)
+			database.Delete(db, deleted)
 		}
 	}
 }
